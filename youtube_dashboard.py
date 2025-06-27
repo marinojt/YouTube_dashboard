@@ -146,7 +146,7 @@ if 'view_mode' not in st.session_state:
 # --- Header Section ---
 header_cols = st.columns([3, 1])
 with header_cols[0]:
-    st.markdown("#### YouTube Competitor Analysis | KDP PUBLISHING")
+    st.markdown("#### YouTube Top 10 Competitor Analysis | KDP PUBLISHING")
 with header_cols[1]:
     sorted_channels = sorted(df['Channel Name'].unique())
     default_index = sorted_channels.index('Ken Fornari') if 'Ken Fornari' in sorted_channels else 0
@@ -250,6 +250,23 @@ for (key, config), col in zip(METRICS_CONFIG.items(), cols):
         pie_data['is_main'] = pie_data['Channel Name'] == selected_channel
         colors = [config['color_primary'] if is_main else config['color_secondary'] for is_main in pie_data['is_main']]
         
+        # --- Generate subtitle text and combined title for the pie chart ---
+        total_val = df[config['pie_chart_col']].sum()
+        subtitle_text = ""
+        if key == 'reach':
+            subtitle_text = f"{total_val / 1e6:.1f} million views"
+        elif key == 'efficiency':
+            subtitle_text = f"{total_val:,.0f} minutes"
+        elif key == 'engagement':
+            subtitle_text = f"{total_val:,.0f} likes"
+        elif key == 'activity':
+            subtitle_text = f"{total_val:,.0f} long-form videos"
+        
+        full_title_text = (
+            f"<b>{config['pie_chart_title']}</b><br>"
+            f"<span style='font-size: 12px; color: #666; font-weight: normal;'>{subtitle_text}</span>"
+        )
+        
         pie_fig = go.Figure(data=[go.Pie(
             labels=pie_data['Channel Name'], values=pie_data[config['pie_chart_col']],
             marker_colors=colors,
@@ -261,12 +278,12 @@ for (key, config), col in zip(METRICS_CONFIG.items(), cols):
             marker={'line': {'color': 'white', 'width': 2}}
         )
         pie_fig.update_layout(
-            title_text=f"<b>{config['pie_chart_title']}</b>", 
-            title_x=0.5,  # This should center it
-            title_xanchor='center',  # Add this line to ensure proper anchoring
+            title_text=full_title_text,
+            title_x=0.5,
+            title_xanchor='center',
             title_font=dict(size=14, color=config['color_primary'], family=MODERN_FONT_STACK),
             showlegend=False, 
-            margin=dict(t=50, b=10, l=10, r=10),  # Ensure equal left/right margins
+            margin=dict(t=70, b=10, l=10, r=10), # Adjusted top margin for subtitle
             height=250,
             paper_bgcolor='white', 
             plot_bgcolor='white', 
@@ -274,16 +291,6 @@ for (key, config), col in zip(METRICS_CONFIG.items(), cols):
         )
         st.plotly_chart(pie_fig, use_container_width=True, config={'displayModeBar': False})
         
-        total_val = df[config['pie_chart_col']].sum()
-        if key == 'reach':
-            st.markdown(f"<p style='text-align: center; font-size: 12px; color: #666;'>{total_val / 1e6:.1f} million views</p>", unsafe_allow_html=True)
-        elif key == 'efficiency':
-            st.markdown(f"<p style='text-align: center; font-size: 12px; color: #666; line-height:1.2'>{total_val:,.0f} minutes of<br>long-form content</p>", unsafe_allow_html=True)
-        elif key == 'engagement':
-            st.markdown(f"<p style='text-align: center; font-size: 12px; color: #666;'>{total_val:,.0f} likes</p>", unsafe_allow_html=True)
-        elif key == 'activity':
-            st.markdown(f"<p style='text-align: center; font-size: 12px; color: #666;'>{total_val:,.0f} long-form videos</p>", unsafe_allow_html=True)
-
         st.divider()
 
         # --- Rankings Block ---
