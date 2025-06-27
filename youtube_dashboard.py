@@ -7,9 +7,9 @@ st.set_page_config(layout="wide")
 
 # --- Data Loading and Preparation (Same as Dash) ---
 try:
-    df = pd.read_csv('statistics.csv')
+    df = pd.read_csv('youtube_metrics.csv')
 except FileNotFoundError:
-    st.error("Error: 'statistics.csv' not found. Please make sure the file is in the same directory as the script.")
+    st.error("Error: 'youtube_metrics.csv' not found. Please make sure the file is in the same directory as the script.")
     st.stop()
 
 METRICS_CONFIG = {
@@ -146,7 +146,7 @@ if 'view_mode' not in st.session_state:
 # --- Header Section ---
 header_cols = st.columns([3, 1])
 with header_cols[0]:
-    st.markdown("##### YouTube Competitor Analysis | Performance Overview")
+    st.markdown("#### YouTube Competitor Analysis | KDP PUBLISHING")
 with header_cols[1]:
     sorted_channels = sorted(df['Channel Name'].unique())
     default_index = sorted_channels.index('Ken Fornari') if 'Ken Fornari' in sorted_channels else 0
